@@ -3,7 +3,7 @@ import { useInventory } from '../context/InventoryContext';
 import { Trash2 } from 'lucide-react';
 
 export function Sold() {
-  const { items, deleteItem, isLoading } = useInventory();
+  const { items, deleteItem, isLoading, formatCurrency } = useInventory();
   const soldItems = items.filter(i => i.status === 'Sold');
 
   if (isLoading) {
@@ -26,13 +26,13 @@ export function Sold() {
         <div>
           <p className="text-sm font-medium text-slate-500 mb-1">Total Profit</p>
           <p className={`text-3xl font-bold tracking-tight ${totalProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-            {totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()}
+            {totalProfit >= 0 ? '+' : ''}{formatCurrency(totalProfit)}
           </p>
         </div>
         <div>
           <p className="text-sm font-medium text-slate-500 mb-1">Total Revenue</p>
           <p className="text-3xl font-bold tracking-tight text-slate-900">
-            ${totalRevenue.toLocaleString()}
+            {formatCurrency(totalRevenue)}
           </p>
         </div>
       </div>
@@ -52,13 +52,13 @@ export function Sold() {
                   <div className="flex-1 pr-4">
                     <div className="text-lg font-medium text-slate-900">{item.name}</div>
                     <div className="text-slate-500 text-sm mt-0.5">
-                      Bought for ${item.buyPrice.toLocaleString()} • Sold for ${(item.sellPrice || 0).toLocaleString()}
+                      Bought for {formatCurrency(item.buyPrice)} • Sold for {formatCurrency(item.sellPrice || 0)}
                     </div>
                   </div>
                   
                   <div className="flex flex-col items-end justify-center gap-1">
                     <span className={`font-bold ${profit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {profit >= 0 ? '+' : ''}${profit.toLocaleString()}
+                      {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
                     </span>
                     <button 
                       onClick={() => deleteItem(item.id)} 

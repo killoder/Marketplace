@@ -4,17 +4,22 @@ import { projectId, publicAnonKey } from '/utils/supabase/info';
 export interface Item {
   id: string;
   name: string;
+  category: string;
+  brand: string;
+  condition: string;
+  purchaseDate: string;
   buyPrice: number;
   sellPrice?: number;
-  status: 'Active' | 'Sold';
+  status: 'In Stock' | 'Sold' | 'Reserved';
 }
 
 interface InventoryContextType {
   items: Item[];
-  addItem: (name: string, buyPrice: number) => Promise<void>;
+  addItem: (item: Omit<Item, 'id' | 'status'>) => Promise<void>;
   markSold: (id: string, sellPrice: number) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   isLoading: boolean;
+  formatCurrency: (amount: number) => string;
 }
 
 const API_BASE = `https://${projectId}.supabase.co/functions/v1/make-server-d694d660`;
@@ -36,6 +41,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       });
       if (response.ok) {
         const data = await response.json();
+        data.sort((a: Item, b: Item) => a.name.localeCompare(b.name));
         setItems(data);
       }
     } catch (err) {
@@ -49,11 +55,10 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     fetchItems();
   }, []);
 
-  const addItem = async (name: string, buyPrice: number) => {
+  const addItem = async (itemData: Omit<Item, 'id' | 'status'>) => {
     const newItem: Partial<Item> = {
-      name,
-      buyPrice,
-      status: 'Active',
+      ...itemData,
+      status: 'In Stock',
     };
     
     try {
@@ -68,7 +73,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       
       if (response.ok) {
         const savedItem = await response.json();
-        setItems((prev) => [savedItem, ...prev]);
+        setItems((prev) => [...prev, savedItem].sort((a, b) => a.name.localeCompare(b.name)));
       }
     } catch (err) {
       console.error("Error adding item:", err);
@@ -115,8 +120,15 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IE', {
+      style: 'currency',
+      currency: 'EUR',
+    }).format(amount);
+  };
+
   return (
-    <InventoryContext.Provider value={{ items, addItem, markSold, deleteItem, isLoading }}>
+    <InventoryContext.Provider value={{ items, addItem, markSold, deleteItem, isLoading, formatCurrency }}>
       {children}
     </InventoryContext.Provider>
   );

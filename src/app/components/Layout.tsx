@@ -7,8 +7,7 @@ export function Layout() {
       <div className="max-w-2xl mx-auto px-6 py-12 md:py-20">
         <header className="flex flex-col sm:flex-row justify-between sm:items-end gap-6 mb-12">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Inventory Notes</h1>
-            <p className="text-slate-500 text-sm mt-1">Keep track of your gear. Keep it simple.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Marketplace</h1>
           </div>
           <nav className="flex gap-6 text-sm font-medium text-slate-400">
             <NavLink 

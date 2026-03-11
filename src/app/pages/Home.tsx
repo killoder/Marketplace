@@ -5,6 +5,7 @@ import { Trash2 } from 'lucide-react';
 function ActiveItemRow({ item, onSell, onDelete }: { item: Item; onSell: (id: string, price: number) => void; onDelete: (id: string) => void }) {
   const [sellPrice, setSellPrice] = useState('');
   const [isSelling, setIsSelling] = useState(false);
+  const { formatCurrency } = useInventory();
 
   const handleSell = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,14 +18,14 @@ function ActiveItemRow({ item, onSell, onDelete }: { item: Item; onSell: (id: st
     <div className="group flex flex-row items-center justify-between py-3 border-b border-slate-200/60 gap-4 transition-opacity min-h-[56px]">
       <div className="flex flex-1 flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 min-w-0">
         <div className="text-lg font-medium text-slate-900 truncate leading-none">{item.name}</div>
-        <div className="text-slate-400 text-sm whitespace-nowrap leading-none font-normal">Bought for ${item.buyPrice.toLocaleString()}</div>
+        <div className="text-slate-400 text-sm whitespace-nowrap leading-none font-normal">Bought for {formatCurrency(item.buyPrice)}</div>
       </div>
       
       <div className="flex items-center gap-3 shrink-0">
         {isSelling ? (
           <form onSubmit={handleSell} className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2 duration-200">
             <div className="relative">
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">$</span>
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-medium">€</span>
               <input 
                 type="number" 
                 required
@@ -78,8 +79,8 @@ function ActiveItemRow({ item, onSell, onDelete }: { item: Item; onSell: (id: st
 }
 
 export function Home() {
-  const { items, addItem, markSold, deleteItem, isLoading } = useInventory();
-  const activeItems = items.filter(i => i.status === 'Active');
+  const { items, addItem, markSold, deleteItem, isLoading, formatCurrency } = useInventory();
+  const activeItems = items.filter(i => i.status === 'In Stock');
 
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
@@ -88,7 +89,14 @@ export function Home() {
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (name && buyPrice) {
-      addItem(name, parseFloat(buyPrice));
+      addItem({
+        name,
+        buyPrice: parseFloat(buyPrice),
+        category: 'Uncategorized',
+        brand: '',
+        condition: 'Good',
+        purchaseDate: new Date().toISOString().split('T')[0]
+      });
       setName('');
       setBuyPrice('');
       setIsAdding(false);
@@ -120,7 +128,7 @@ export function Home() {
               <div className="relative w-full sm:w-32">
                 <label className="block text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-1 ml-0.5">Cost</label>
                 <div className="relative">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400 text-lg font-medium">$</span>
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-slate-400 text-lg font-medium">€</span>
                   <input 
                     type="number" 
                     required
@@ -162,7 +170,7 @@ export function Home() {
         <div className="flex justify-between items-end mb-6 border-b border-slate-900 pb-3">
           <div>
             <h2 className="font-bold text-slate-900 text-xl tracking-tight">Current Inventory ({activeItems.length})</h2>
-            <p className="text-sm font-medium text-slate-500 mt-0.5">Total Invested: ${totalInvested.toLocaleString()}</p>
+            <p className="text-sm font-medium text-slate-500 mt-0.5">Total Invested: {formatCurrency(totalInvested)}</p>
           </div>
           
           {!isAdding && (
