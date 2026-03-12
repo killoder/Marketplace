@@ -200,7 +200,7 @@ export function Home() {
             ))
           ) : (
             <div className="py-8 text-slate-400 italic text-center">
-              You don't have any active items. Add something above.
+              You don't have any active items.
             </div>
           )}
         </div>
