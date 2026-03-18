@@ -4,7 +4,13 @@ import { Trash2 } from 'lucide-react';
 
 export function Sold() {
   const { items, deleteItem, isLoading, formatCurrency } = useInventory();
-  const soldItems = items.filter(i => i.status === 'Sold');
+  const soldItems = items
+    .filter(i => i.status === 'Sold')
+    .sort((a, b) => {
+      const dateA = new Date(a.sellDate || a.purchaseDate).getTime();
+      const dateB = new Date(b.sellDate || b.purchaseDate).getTime();
+      return dateB - dateA; // Sorts descending (newest first)
+    });
 
   if (isLoading) {
     return (

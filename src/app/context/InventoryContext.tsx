@@ -8,6 +8,7 @@ export interface Item {
   brand: string;
   condition: string;
   purchaseDate: string;
+  sellDate?: string;
   buyPrice: number;
   sellPrice?: number;
   status: 'In Stock' | 'Sold' | 'Reserved';
